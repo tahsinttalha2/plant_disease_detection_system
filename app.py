@@ -13,7 +13,6 @@ import json
 # Page configuration
 st.set_page_config(
     page_title="Plant Disease Detector",
-    page_icon="🌱",
     layout="centered"
 )
 
@@ -148,12 +147,12 @@ def predict_disease(model, image, class_names, top_k=5):
 
 def main():
     # Header
-    st.markdown('<p class="main-header">🌱 Plant Disease Detection System</p>', unsafe_allow_html=True)
+    st.markdown('<p class="main-header">Plant Disease Detection System</p>', unsafe_allow_html=True)
     st.markdown('<p class="sub-header">Upload an image to identify plant diseases using AI</p>', unsafe_allow_html=True)
     
     # Sidebar for configuration
     with st.sidebar:
-        st.header("⚙️ Settings")
+        st.header("Settings")
         
         model_path = st.text_input(
             "Model Path",
@@ -170,7 +169,7 @@ def main():
         )
         
         st.markdown("---")
-        st.markdown("### 📋 About")
+        st.markdown("### About")
         st.info(
             "This app uses a Convolutional Neural Network (CNN) "
             "trained on 38 different plant disease categories to identify "
@@ -181,109 +180,95 @@ def main():
     model = load_model(model_path)
     
     if model is None:
-        st.error("❌ Failed to load model. Please check the model path in the sidebar.")
+        st.error("Failed to load model. Please check the model path in the sidebar.")
         st.stop()
     
     # Load class names
     class_names = load_class_names()
     
-    st.success(f"✅ Model loaded successfully! Ready to classify {len(class_names)} disease types.")
+    st.success(f"Model loaded successfully! Ready to classify {len(class_names)} disease types.")
     
     # File uploader with multiple input options
-    st.markdown("### 📤 Upload Plant Image")
+    st.markdown("### Upload Plant Image")
     
     uploaded_file = st.file_uploader(
         "Choose an image file or drag and drop",
         type=['jpg', 'jpeg', 'png', 'webp'],
         help="Supported formats: JPG, JPEG, PNG, WEBP"
     )
-    
-    # Alternative: Paste from clipboard (using camera input as proxy)
-    col1, col2 = st.columns(2)
-    with col1:
-        camera_image = st.camera_input("📷 Or take a photo")
+
     
     # Process the uploaded image
     image_to_process = None
     
     if uploaded_file is not None:
         image_to_process = Image.open(uploaded_file)
-    elif camera_image is not None:
-        image_to_process = Image.open(camera_image)
     
     if image_to_process is not None:
-        # Create two columns for layout
-        col1, col2 = st.columns([1, 1])
+        st.markdown("### Analysis")
         
-        with col1:
-            st.markdown("### 📷 Uploaded Image")
-            st.image(image_to_process, use_container_width=True)
-        
-        with col2:
-            st.markdown("### 🔍 Analysis")
-            
-            # Add a predict button
-            if st.button("🔬 Analyze Image", type="primary", use_container_width=True):
-                with st.spinner("Analyzing image..."):
-                    # Get predictions
-                    predictions = predict_disease(model, image_to_process, class_names, top_k=top_k)
+        # Add a predict button
+        if st.button("Analyze Image", type="primary", use_container_width=True):
+            with st.spinner("Analyzing image..."):
+                # Get predictions
+                predictions = predict_disease(model, image_to_process, class_names, top_k=top_k)
+                
+                # Display top prediction prominently
+                top_disease, top_confidence = predictions[0]
+                
+                st.markdown("#### Top Prediction")
+                confidence_class = get_confidence_color(top_confidence)
+                st.markdown(
+                    f'<div class="prediction-box">'
+                    f'<h3 style="margin:0; color:#2e7d32;">{top_disease}</h3>'
+                    f'<p class="{confidence_class}" style="font-size:1.5rem; margin:0.5rem 0 0 0;">'
+                    f'{top_confidence*100:.2f}% confidence</p>'
+                    f'</div>',
+                    unsafe_allow_html=True
+                )
+                
+                # Display all predictions
+                st.markdown("#### All Predictions")
+                
+                for i, (disease, confidence) in enumerate(predictions, 1):
+                    # Create progress bar for each prediction
+                    col_rank, col_name, col_conf = st.columns([0.5, 3, 1.5])
                     
-                    # Display top prediction prominently
-                    top_disease, top_confidence = predictions[0]
+                    with col_rank:
+                        st.markdown(f"**{i}.**")
                     
-                    st.markdown("#### 🎯 Top Prediction")
-                    confidence_class = get_confidence_color(top_confidence)
-                    st.markdown(
-                        f'<div class="prediction-box">'
-                        f'<h3 style="margin:0; color:#2e7d32;">{top_disease}</h3>'
-                        f'<p class="{confidence_class}" style="font-size:1.5rem; margin:0.5rem 0 0 0;">'
-                        f'{top_confidence*100:.2f}% confidence</p>'
-                        f'</div>',
-                        unsafe_allow_html=True
-                    )
+                    with col_name:
+                        st.markdown(f"**{disease}**")
                     
-                    # Display all predictions
-                    st.markdown("#### 📊 All Predictions")
+                    with col_conf:
+                        confidence_class = get_confidence_color(confidence)
+                        st.markdown(f'<span class="{confidence_class}">{confidence*100:.1f}%</span>', unsafe_allow_html=True)
                     
-                    for i, (disease, confidence) in enumerate(predictions, 1):
-                        # Create progress bar for each prediction
-                        col_rank, col_name, col_conf = st.columns([0.5, 3, 1.5])
-                        
-                        with col_rank:
-                            st.markdown(f"**{i}.**")
-                        
-                        with col_name:
-                            st.markdown(f"**{disease}**")
-                        
-                        with col_conf:
-                            confidence_class = get_confidence_color(confidence)
-                            st.markdown(f'<span class="{confidence_class}">{confidence*100:.1f}%</span>', unsafe_allow_html=True)
-                        
-                        # Progress bar
-                        st.progress(confidence)
-                        
-                        if i < len(predictions):
-                            st.markdown("<br>", unsafe_allow_html=True)
+                    # Progress bar
+                    st.progress(confidence)
                     
-                    # Additional information
-                    st.markdown("---")
-                    st.info(
-                        "💡 **Tip:** Higher confidence scores indicate more certain predictions. "
-                        "If confidence is low, try uploading a clearer image or one taken in better lighting."
-                    )
+                    if i < len(predictions):
+                        st.markdown("<br>", unsafe_allow_html=True)
+                
+                # Additional information
+                st.markdown("---")
+                st.info(
+                    "Tip: Higher confidence scores indicate more certain predictions. "
+                    "If confidence is low, try uploading a clearer image or one taken in better lighting."
+                )
     
     else:
         # Instructions when no image is uploaded
         st.info(
-            "👆 Please upload an image of a plant leaf using one of the methods above. "
+            "Please upload an image of a plant leaf using one of the methods above. "
             "You can:\n"
-            "- **Upload** a file from your computer\n"
-            "- **Drag and drop** an image into the upload box\n"
-            "- **Take a photo** using your camera\n"
+            "- Upload a file from your computer\n"
+            "- Drag and drop an image into the upload box\n"
+            "- Take a photo using your camera\n"
         )
         
         # Show example of what to expect
-        with st.expander("ℹ️ What kind of images work best?"):
+        with st.expander("What kind of images work best?"):
             st.markdown("""
             **For best results:**
             - Use clear, well-lit images of plant leaves
