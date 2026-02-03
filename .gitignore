@@ -1,3 +1,6 @@
 test
 train
-valid
+valid*.h5
+*.keras
+__pycache__/
+*.pyc
