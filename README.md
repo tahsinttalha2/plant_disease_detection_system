@@ -1,5 +1,3 @@
-Dataset Link: https://www.kaggle.com/datasets/vipoooool/new-plant-diseases-dataset
-
 # 🌱 Plant Disease Detection - Streamlit App
 
 A web application for detecting plant diseases using a trained Convolutional Neural Network (CNN) model.
@@ -32,8 +30,7 @@ This will:
 ### Step 2: Prepare Your Model
 
 Make sure your trained model file is ready:
-- `plant_disease_model.keras` (recommended) or
-- `plant_disease_model.h5`
+- `plant_disease_model.h5` (your model file)
 
 Place it in the same directory as `app.py`, or note its location.
 
@@ -55,7 +52,7 @@ your-project/
 ├── app.py                          # Main Streamlit application
 ├── extract_class_names.py          # Script to extract class names
 ├── class_names.json                # Generated file with disease names
-├── plant_disease_model.keras       # Your trained model
+├── plant_disease_model.h5          # Your trained model
 └── train/                          # Your training directory (optional)
     ├── disease_1/
     ├── disease_2/
