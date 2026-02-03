@@ -5,3 +5,4 @@ valid*.h5
 __pycache__/
 *.pyc
 *.h5
+*.keras
