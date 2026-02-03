@@ -157,8 +157,8 @@ def main():
         
         model_path = st.text_input(
             "Model Path",
-            value="plant_disease_model.keras",
-            help="Path to your trained model file (.keras or .h5)"
+            value="plant_disease_model.h5",
+            help="Path to your trained model file (.h5 or .keras)"
         )
         
         top_k = st.slider(
