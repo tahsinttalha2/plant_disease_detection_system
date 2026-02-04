@@ -1,5 +1,7 @@
 # 🌱 Plant Disease Detection - Streamlit App
 
+Manually run the codes using the following method or directly use the web app version using the link: https://plant-disease-detection-tahsinttalha.streamlit.app/
+
 A web application for detecting plant diseases using a trained Convolutional Neural Network (CNN) model.
 
 ## 📋 Prerequisites
